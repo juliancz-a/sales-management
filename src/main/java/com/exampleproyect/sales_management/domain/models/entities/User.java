@@ -17,6 +17,8 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
 import jakarta.persistence.UniqueConstraint;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 
 @Entity
 @Table(name="users")
@@ -27,11 +29,20 @@ public class User {
     private Long id;
 
     // Credentials
+    @Size(min=6, max=20, message="The username field must contain between 6 and 20 characters")
+    @NotBlank(message="{NotBlank}")
     private String username;
+
+    @Size(min=8, max=20, message= "The password field must contain between 8 and 20 characters")
+    @NotBlank(message="{NotBlank}")
     private String password;
 
-
+    @Size(min=3, max=20, message= "The name field must contain between 3 and 20 characters")
+    @NotBlank(message="{NotBlank}")
     private String name;
+
+    @Size(min=3, max=20, message= "The lastname field must contain between 3 and 20 characters")
+    @NotBlank(message="{NotBlank}")
     private String lastname;
 
     @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
@@ -109,7 +120,6 @@ public class User {
         this.sales = sales;
     }
     
-
     public boolean isAdmin() {
         return admin;
     }
@@ -117,16 +127,5 @@ public class User {
     public void setAdmin(boolean admin) {
         this.admin = admin;
     }
-
-    //set bidireccional relation
-    //public void addSale(Sale sale) {
-    //    sales.add(sale);
-    //    sale.setUser(this);
-    //}
-
-
-    
-    
-
 
 }

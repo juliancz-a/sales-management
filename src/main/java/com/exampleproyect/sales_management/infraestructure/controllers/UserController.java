@@ -39,6 +39,11 @@ public class UserController {
         return ResponseEntity.notFound().build();
     }
 
+    @PostMapping("/users/add")
+    public ResponseEntity<?> addUser(@RequestBody User user) {
+        
+        return ResponseEntity.status(HttpStatus.CREATED).body(service.save(user));
+    }
     
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody User user) {
@@ -46,13 +51,6 @@ public class UserController {
         user.setAdmin(false);
         return addUser(user);
     } 
-
-    @PostMapping("/users/add")
-    public ResponseEntity<?> addUser(@RequestBody User user) {
-        
-        return ResponseEntity.status(HttpStatus.CREATED).body(service.save(user)); //rework with jwt
-    }
-
 
     // TODO => User update credentials and general info
 

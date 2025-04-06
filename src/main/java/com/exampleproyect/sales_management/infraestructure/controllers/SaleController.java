@@ -40,7 +40,7 @@ public class SaleController {
     }
 
     @PostMapping("/sales/{idUser}")
-    public ResponseEntity<?> listById(@PathVariable Long idUser, @RequestBody List<SaleDetailsDto> salesDetailsDto) {
+    public ResponseEntity<?> addSale (@PathVariable Long idUser, @RequestBody List<SaleDetailsDto> salesDetailsDto) {
 
         SaleDto persistedSale = service.save(idUser, salesDetailsDto);
 
