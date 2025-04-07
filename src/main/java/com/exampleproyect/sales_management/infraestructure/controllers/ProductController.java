@@ -5,6 +5,7 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -15,9 +16,15 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.exampleproyect.sales_management.domain.models.entities.Product;
 import com.exampleproyect.sales_management.services.ProductService;
+import com.exampleproyect.sales_management.utils.RequestValidation;
+
+import jakarta.validation.Valid;
 
 @RestController
 public class ProductController {
+
+    @Autowired
+    RequestValidation validationUtil;
 
     @Autowired
     ProductService service;
@@ -39,13 +46,18 @@ public class ProductController {
     }
 
     @PostMapping("/products/add")
-    public ResponseEntity<?> addProduct(@RequestBody Product product) {
-        
+    public ResponseEntity<?> addProduct(@Valid @RequestBody Product product, BindingResult result) {
+
+        validationUtil.validate(result);
+
         return ResponseEntity.status(HttpStatus.CREATED).body(service.save(product));
     }
 
     @PutMapping("products/update/{id}")
-    public ResponseEntity<?> updateProduct (@PathVariable Long id, @RequestBody Product product) {
+    public ResponseEntity<?> updateProduct (@RequestBody Product product, BindingResult result, @PathVariable Long id ) {
+
+        validationUtil.validate(result);
+
         Optional<Product> optionalProductDb = service.update(id, product);
 
         if(optionalProductDb.isPresent()) {
@@ -56,16 +68,18 @@ public class ProductController {
     }
 
     @DeleteMapping("/products/delete/{id}")
-    public ResponseEntity<?> deleteProduct (@PathVariable Long id) {
-    Optional<Product> optionalProductDb = service.delete(id);
+    public ResponseEntity<?> deleteProduct (@PathVariable Long id, BindingResult result) {
+        validationUtil.validate(result);
 
-    if(optionalProductDb.isPresent()) {
-        return ResponseEntity.status(HttpStatus.OK).body(optionalProductDb.orElseThrow());
-    }
+        Optional<Product> optionalProductDb = service.delete(id);
 
-    return ResponseEntity.notFound().build();
+        if(optionalProductDb.isPresent()) {
+            return ResponseEntity.status(HttpStatus.OK).body(optionalProductDb.orElseThrow());
+        }
 
-    }
+        return ResponseEntity.notFound().build();
+
+        }
     
 
 }

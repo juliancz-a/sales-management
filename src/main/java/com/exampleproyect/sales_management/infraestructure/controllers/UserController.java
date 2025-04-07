@@ -5,6 +5,7 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -15,10 +16,14 @@ import org.springframework.web.bind.annotation.RestController;
 import com.exampleproyect.sales_management.domain.models.entities.User;
 import com.exampleproyect.sales_management.dto.UserDto;
 import com.exampleproyect.sales_management.services.UserService;
+import com.exampleproyect.sales_management.utils.RequestValidation;
 
 
 @RestController
 public class UserController {
+    
+    @Autowired
+    RequestValidation validationUtil;
 
     @Autowired
     UserService service;
@@ -40,24 +45,28 @@ public class UserController {
     }
 
     @PostMapping("/users/add")
-    public ResponseEntity<?> addUser(@RequestBody User user) {
+    public ResponseEntity<?> addUser(@RequestBody User user, BindingResult result) {
+
+        validationUtil.validate(result);
         
         return ResponseEntity.status(HttpStatus.CREATED).body(service.save(user));
     }
     
     @PostMapping("/register")
-    public ResponseEntity<?> register(@RequestBody User user) {
+    public ResponseEntity<?> register(@RequestBody User user, BindingResult result) {
 
         user.setAdmin(false);
-        return addUser(user);
+        return addUser(user, result);
     } 
 
     // TODO => User update credentials and general info
 
     @DeleteMapping("/users/delete/{id}")
-    public ResponseEntity<?> deleteUser (@PathVariable Long id) {
-        Optional<User> optionalUserDb = service.delete(id);
+    public ResponseEntity<?> deleteUser (@PathVariable Long id, BindingResult result) {
+        
+        validationUtil.validate(result);
 
+        Optional<User> optionalUserDb = service.delete(id);
         if(optionalUserDb.isPresent()) {
             return ResponseEntity.status(HttpStatus.OK).body(optionalUserDb.orElseThrow());
         }
