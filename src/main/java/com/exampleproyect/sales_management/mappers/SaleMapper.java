@@ -17,7 +17,7 @@ public class SaleMapper {
 
         saleDto.setId(sale.getId());
         saleDto.setUser(UserMapper.toDto(sale.getUser()));
-        saleDto.setSaleDetails(SaleDetailsMapper.listToDto(sale.getSaleDetail()));
+        saleDto.setSalesDetails(SaleDetailsMapper.listToDto(sale.getSaleDetail()));
         saleDto.setDate(sale.getDate());
 
         return saleDto;

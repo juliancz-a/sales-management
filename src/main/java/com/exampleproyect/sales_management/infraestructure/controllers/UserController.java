@@ -18,6 +18,8 @@ import com.exampleproyect.sales_management.dto.UserDto;
 import com.exampleproyect.sales_management.services.UserService;
 import com.exampleproyect.sales_management.utils.RequestValidation;
 
+import jakarta.validation.Valid;
+
 
 @RestController
 public class UserController {
@@ -45,7 +47,7 @@ public class UserController {
     }
 
     @PostMapping("/users/add")
-    public ResponseEntity<?> addUser(@RequestBody User user, BindingResult result) {
+    public ResponseEntity<?> addUser(@Valid @RequestBody User user, BindingResult result) {
 
         validationUtil.validate(result);
         
@@ -53,7 +55,7 @@ public class UserController {
     }
     
     @PostMapping("/register")
-    public ResponseEntity<?> register(@RequestBody User user, BindingResult result) {
+    public ResponseEntity<?> register(@Valid @RequestBody User user, BindingResult result) {
 
         user.setAdmin(false);
         return addUser(user, result);
@@ -62,7 +64,7 @@ public class UserController {
     // TODO => User update credentials and general info
 
     @DeleteMapping("/users/delete/{id}")
-    public ResponseEntity<?> deleteUser (@PathVariable Long id, BindingResult result) {
+    public ResponseEntity<?> deleteUser (@Valid @PathVariable Long id, BindingResult result) {
         
         validationUtil.validate(result);
 

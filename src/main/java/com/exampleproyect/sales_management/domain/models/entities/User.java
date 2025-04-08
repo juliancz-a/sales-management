@@ -14,6 +14,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
 import jakarta.persistence.UniqueConstraint;
@@ -33,7 +34,10 @@ public class User {
     @NotBlank(message="{NotBlank}")
     private String username;
 
-    @Size(min=8, max=20, message= "The password field must contain between 8 and 20 characters")
+    @Size(min=8, max=50, message="The email field must contain between 10 and 20 characters")
+    @NotBlank(message="{NotBlank}")
+    private String email;
+
     @NotBlank(message="{NotBlank}")
     private String password;
 
@@ -56,12 +60,19 @@ public class User {
     @OneToMany(mappedBy="user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Sale> sales;
 
+    private boolean enabled;
+
     // Configured in controller
     @Transient
     private boolean admin;
 
     public User() {
         this.roles = new ArrayList<>();
+    }
+
+    @PrePersist
+    public void prePersist() {
+        enabled = true;
     }
 
     public Long getId() {
@@ -127,5 +138,23 @@ public class User {
     public void setAdmin(boolean admin) {
         this.admin = admin;
     }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public boolean isEnabled() {
+        return enabled;
+    }
+
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
+    }
+
+
 
 }

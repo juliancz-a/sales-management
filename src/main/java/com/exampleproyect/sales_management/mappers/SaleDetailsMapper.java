@@ -15,7 +15,7 @@ public class SaleDetailsMapper {
 
         SaleDetailsDto saleDetailsDto = new SaleDetailsDto();
 
-        saleDetailsDto.setId(saleDetails.getProduct().getId());
+        saleDetailsDto.setProduct(ProductMapper.toDto(saleDetails.getProduct()));
         saleDetailsDto.setQuantity(saleDetails.getProductQuantity());
         return saleDetailsDto;
     } 

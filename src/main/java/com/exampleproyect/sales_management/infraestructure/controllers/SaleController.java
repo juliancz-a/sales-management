@@ -1,5 +1,6 @@
 package com.exampleproyect.sales_management.infraestructure.controllers;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
@@ -12,11 +13,15 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.exampleproyect.sales_management.domain.models.CartItem;
+import com.exampleproyect.sales_management.domain.models.Invoice;
 import com.exampleproyect.sales_management.domain.models.entities.User;
 import com.exampleproyect.sales_management.domain.repositories.UserRepository;
-import com.exampleproyect.sales_management.dto.SaleDetailsDto;
 import com.exampleproyect.sales_management.dto.SaleDto;
 import com.exampleproyect.sales_management.services.SaleService;
+import com.exampleproyect.sales_management.utils.SaleDetailsExporter;
+
+import jakarta.servlet.http.HttpServletResponse;
 
 @RestController
 public class SaleController {
@@ -45,17 +50,24 @@ public class SaleController {
     }
 
     @PostMapping("/buy")
-    public ResponseEntity<?> addSale (Authentication auth, @RequestBody List<SaleDetailsDto> salesDetailsDto) {
+    public void addSale (Authentication auth, @RequestBody List<CartItem> cartItems,
+    HttpServletResponse response) throws IOException {
 
         Optional<Long> optionalUserId = getCurrentUserId(auth);
-
         if(optionalUserId.isEmpty()) {
-            return ResponseEntity.notFound().build();
         }
 
-        SaleDto persistedSale = service.save(optionalUserId.get(), salesDetailsDto);
+        SaleDto persistedSale = service.save(optionalUserId.get(), cartItems);
 
-        return ResponseEntity.ok(persistedSale);
+        Invoice invoice = new Invoice();
+        invoice.setSale(persistedSale);
+
+        response.setContentType("application/pdf");
+        response.addHeader("Content-Disposition", "attachment; filename=details.pdf");
+        SaleDetailsExporter exporter = new SaleDetailsExporter(invoice);
+
+        exporter.export(response);
+
     }
 
     private Optional<Long> getCurrentUserId(Authentication auth) {
@@ -71,5 +83,21 @@ public class SaleController {
         return Optional.empty();
     }
     
+
+
+
+    
+    // @PostMapping("/buy")
+    // public HttpServletResponse addSale (Authentication auth, @RequestBody List<SaleDetailsDto> salesDetailsDto) {
+
+    //     Optional<Long> optionalUserId = getCurrentUserId(auth);
+    //     if(optionalUserId.isEmpty()) {
+    //         return ResponseEntity.notFound().build();
+    //     }
+
+    //     SaleDto persistedSale = service.save(optionalUserId.get(), salesDetailsDto);
+
+    //     return ResponseEntity.ok(persistedSale);
+    // }
 
 }

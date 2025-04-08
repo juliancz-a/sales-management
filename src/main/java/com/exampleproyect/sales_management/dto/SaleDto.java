@@ -9,14 +9,14 @@ public class SaleDto {
 
     private UserDto user;
 
-    private List<SaleDetailsDto> saleDetails;
+    private List<SaleDetailsDto> salesDetails;
 
     private LocalDateTime date;
 
-    public SaleDto(Long id, UserDto userDto, List<SaleDetailsDto>  saleDetailsDto, LocalDateTime date) {
+    public SaleDto(Long id, UserDto userDto, List<SaleDetailsDto>  salesDetailsDto, LocalDateTime date) {
         this.id = id;
         this.user = userDto;
-        this.saleDetails = saleDetailsDto;
+        this.salesDetails = salesDetailsDto;
         this.date = date;
     }
 
@@ -39,12 +39,12 @@ public class SaleDto {
         this.user = userDto;
     }
 
-    public List<SaleDetailsDto>  getSaleDetails() {
-        return saleDetails;
+    public List<SaleDetailsDto>  getSalesDetails() {
+        return salesDetails;
     }
 
-    public void setSaleDetails(List<SaleDetailsDto>  saleDetailsDto) {
-        this.saleDetails = saleDetailsDto;
+    public void setSalesDetails(List<SaleDetailsDto>  saleDetailsDto) {
+        this.salesDetails = saleDetailsDto;
     }
 
     public LocalDateTime getDate() {

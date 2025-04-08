@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.exampleproyect.sales_management.domain.models.CartItem;
 import com.exampleproyect.sales_management.domain.models.entities.Product;
 import com.exampleproyect.sales_management.domain.models.entities.Sale;
 import com.exampleproyect.sales_management.domain.models.entities.SaleDetails;
@@ -15,7 +16,6 @@ import com.exampleproyect.sales_management.domain.models.entities.User;
 import com.exampleproyect.sales_management.domain.repositories.ProductRepository;
 import com.exampleproyect.sales_management.domain.repositories.SaleRepository;
 import com.exampleproyect.sales_management.domain.repositories.UserRepository;
-import com.exampleproyect.sales_management.dto.SaleDetailsDto;
 import com.exampleproyect.sales_management.dto.SaleDto;
 import com.exampleproyect.sales_management.mappers.SaleMapper;
 import com.exampleproyect.sales_management.services.SaleService;
@@ -46,7 +46,7 @@ public class SaleServiceImpl implements SaleService{
 
     @Override
     @Transactional
-    public SaleDto save(Long userId, List<SaleDetailsDto> salesDetailsDto) {
+    public SaleDto save(Long userId, List<CartItem> cartItems) {
         Sale sale = new Sale();
         
         Optional<User> optionalUserDb = userRepository.findById(userId);
@@ -59,14 +59,14 @@ public class SaleServiceImpl implements SaleService{
             Sale savedSale = repository.save(sale);
 
             //DTO to ENTITY
-            List<SaleDetails> saleDetailsList = salesDetailsDto.stream().map(dto -> {
-                Product product = productRepository.findById(dto.getId())
+            List<SaleDetails> saleDetailsList = cartItems.stream().map(cartItem -> {
+                Product product = productRepository.findById(cartItem.getId())
                         .orElseThrow();
 
                 SaleDetails saleDetails = new SaleDetails();
                 saleDetails.setSale(savedSale); 
                 saleDetails.setProduct(product);
-                saleDetails.setProductQuantity(dto.getQuantity());
+                saleDetails.setProductQuantity(cartItem.getQuantity());
 
                 return saleDetails;
 

@@ -1,4 +1,4 @@
-package com.exampleproyect.sales_management.utils;
+package com.exampleproyect.sales_management.utils.exceptions;
 
 import java.util.Map;
 
