@@ -19,6 +19,7 @@ import com.exampleproyect.sales_management.domain.repositories.UserRepository;
 import com.exampleproyect.sales_management.dto.SaleDto;
 import com.exampleproyect.sales_management.mappers.SaleMapper;
 import com.exampleproyect.sales_management.services.SaleService;
+import com.exampleproyect.sales_management.utils.AuthenticationUtil;
 
 @Service
 public class SaleServiceImpl implements SaleService{
@@ -31,6 +32,10 @@ public class SaleServiceImpl implements SaleService{
 
     @Autowired
     ProductRepository productRepository;
+
+    @Autowired 
+    AuthenticationUtil authUtil;
+
 
     @Override
     @Transactional(readOnly=true)
@@ -45,39 +50,47 @@ public class SaleServiceImpl implements SaleService{
     }
 
     @Override
+    public Optional<SaleDto> findByIdAndUser(Long id) {
+
+        Optional<User> optionalUserDb = userRepository.findById(getUserId());
+
+        if(optionalUserDb.isEmpty()) {
+            return Optional.empty();
+        }
+
+        return Optional.of(SaleMapper.toDto(repository.findByIdAndUser(id, optionalUserDb.orElseThrow()).orElseThrow()));
+    }
+
+
+    @Override
     @Transactional
-    public SaleDto save(Long userId, List<CartItem> cartItems) {
+    public SaleDto save(List<CartItem> cartItems) {
         Sale sale = new Sale();
         
-        Optional<User> optionalUserDb = userRepository.findById(userId);
+        Optional<User> optionalUserDb = userRepository.findById(getUserId());
 
+        User userDb = optionalUserDb.orElseThrow();
+        sale.setUser(userDb);
+        Sale savedSale = repository.save(sale);
+
+        //DTO to ENTITY
+        List<SaleDetails> saleDetailsList = cartItems.stream().map(cartItem -> {
+            Product product = productRepository.findById(cartItem.getId())
+                    .orElseThrow();
+
+            SaleDetails saleDetails = new SaleDetails();
+            saleDetails.setSale(savedSale); 
+            saleDetails.setProduct(product);
+            saleDetails.setProductQuantity(cartItem.getQuantity());
+
+            return saleDetails;
+
+        }).collect(Collectors.toList());
+
+        sale.setSaleDetails(saleDetailsList);
         
-        if(optionalUserDb.isPresent()) {
-
-            User userDb = optionalUserDb.get();
-            sale.setUser(userDb);
-            Sale savedSale = repository.save(sale);
-
-            //DTO to ENTITY
-            List<SaleDetails> saleDetailsList = cartItems.stream().map(cartItem -> {
-                Product product = productRepository.findById(cartItem.getId())
-                        .orElseThrow();
-
-                SaleDetails saleDetails = new SaleDetails();
-                saleDetails.setSale(savedSale); 
-                saleDetails.setProduct(product);
-                saleDetails.setProductQuantity(cartItem.getQuantity());
-
-                return saleDetails;
-
-            }).collect(Collectors.toList());
-
-            sale.setSaleDetails(saleDetailsList);
-            
-            return SaleMapper.toDto(repository.save(savedSale));
-        }
-        
-        return null; //revisar
+        return SaleMapper.toDto(repository.save(savedSale));
+    
     }
 
     @Override
@@ -90,5 +103,10 @@ public class SaleServiceImpl implements SaleService{
 
         return optionalSaleDb;
     }
+
+    private Long getUserId() {
+        return authUtil.getCurrentUserId().orElseThrow();
+    }
+
 
 }

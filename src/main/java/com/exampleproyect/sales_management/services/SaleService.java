@@ -14,7 +14,9 @@ public interface SaleService {
     
     Optional<SaleDto> findById(Long id);
 
-    SaleDto save(Long userId, List<CartItem> cartItems);
+    Optional<SaleDto> findByIdAndUser(Long id);
+
+    SaleDto save(List<CartItem> cartItems);
 
     Optional<Sale> delete(Long id);
 

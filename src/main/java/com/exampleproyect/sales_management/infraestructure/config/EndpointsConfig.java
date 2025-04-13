@@ -66,7 +66,8 @@ public class EndpointsConfig {
     }
 
     public String[] obtainAuthRequests() {
-        String requests = getGetRequests().get("authRequired") + "," + getPostRequests().get("authRequired");
+        String requests = getGetRequests().get("authRequired") + "," + getPostRequests().get("authRequired")
+        + "," + getDeleteRequests().get("authRequired");
         return requests.split(",");
     }
 

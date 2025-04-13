@@ -23,7 +23,6 @@ public class SaleDetailsExporter {
 
     private static final Color HEADER_COLOR = Color.getHSBColor(118,0.0f, 0.65f);
 
-
     private Invoice invoice;
 
     public SaleDetailsExporter(Invoice invoice) {
